@@ -73,6 +73,14 @@ class JbuilderTemplateTest < ActiveSupport::TestCase
     assert_equal "Pavel", result[5]["author"]["first_name"]
   end
 
+  test "partial collection by name with caching" do
+    result = render('json.partial! "post", collection: @posts, cached: true, as: :post', posts: POSTS)
+    assert_equal 10, result.count
+    assert_equal "Post #5", result[4]["body"]
+    assert_equal "Heinemeier Hansson", result[2]["author"]["last_name"]
+    assert_equal "Pavel", result[5]["author"]["first_name"]
+  end
+
   test "partial collection by name with string local" do
     result = render('json.partial! "post", collection: @posts, as: "post"', posts: POSTS)
     assert_equal 10, result.count
@@ -294,7 +302,6 @@ class JbuilderTemplateTest < ActiveSupport::TestCase
     test "works with an enumerable object" do
       enumerable_class = Class.new do
         include Enumerable
-        alias length count # Rails 6.1 requires this.
 
         def each(&block)
           [].each(&block)
